@@ -1,0 +1,208 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum VoteSystem {
+  EQUAL
+  WEIGHT
+}
+
+enum VoteApprove {
+  DEFAULT
+  RELATIVE2
+  ABSOLUTE1
+  ABSOLUTE2
+}
+
+model Project {
+  id               String             @id
+  name             String
+  intro            String?
+  logo             String?
+  rule             String?
+  votePeriod       String
+  network          Int
+  symbol           String
+  pointConsensus   String?
+  createAt         DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  deleted          Boolean            @default(false)
+  voteSystem       VoteSystem         @default(EQUAL)
+  voteApprove      VoteApprove        @default(DEFAULT)
+  voteThreshold    Float              @default(0.5)
+  contributions    Contribution[]
+  contributors     Contributor[]
+  MintReocrd       MintReocrd[]
+  ContributionType ContributionType[]
+  allocations      Allocation[]
+  Payment          Payment[]
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String?
+  avatar       String?
+  bio          String?
+  wallet       String        @unique
+  contributors Contributor[]
+}
+
+enum Status {
+  UNREADY
+  READY
+  CLAIM
+}
+
+model Contribution {
+  id               String      @id
+  detail           String
+  proof            String
+  credit           Float
+  toIds            String[]
+  status           Status      @default(UNREADY)
+  uId              String?     @unique
+  owner            Contributor @relation(fields: [ownerId], references: [id])
+  ownerId          String
+  project          Project     @relation(fields: [projectId], references: [id])
+  projectId        String
+  type             String[]
+  contributionDate String?
+  imageList        String[]
+  startDate        DateTime?
+  endDate          DateTime?
+  createAt         DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  deleted          Boolean     @default(false)
+}
+
+model ContributionType {
+  id        String   @id @default(uuid())
+  name      String
+  project   Project  @relation(fields: [projectId], references: [id])
+  projectId String
+  color     String
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deleted   Boolean  @default(false)
+}
+
+model Contributor {
+  id           String         @id @default(uuid())
+  nickName     String
+  wallet       String
+  user         User?          @relation(fields: [userId], references: [id])
+  userId       String?
+  project      Project        @relation(fields: [projectId], references: [id])
+  projectId    String
+  permission   Int
+  role         String
+  createAt     DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deleted      Boolean        @default(false)
+  voteWeight   Float          @default(0.5)
+  Contribution Contribution[]
+  MintReocrd   MintReocrd[]
+}
+
+model MintReocrd {
+  id            String       @id @default(uuid())
+  contributor   Contributor? @relation(fields: [contributorId], references: [id])
+  contributorId String?
+  project       Project      @relation(fields: [projectId], references: [id])
+  projectId     String
+  credit        Int
+  createAt      DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  deleted       Boolean      @default(false)
+}
+
+model Payment {
+  id             String   @id @default(uuid())
+  purpose        String
+  counterparties String[]
+  category       String
+  chainId        String
+  allocate       String
+  symbol         String
+  amount         String
+  project        Project  @relation(fields: [projectId], references: [id])
+  projectId      String
+  creator        String
+  txHash         String
+  createAt       DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  deleted        Boolean  @default(false)
+}
+
+enum AllocationStatus {
+  INITIAL
+  ATTESTED
+  REVOKED
+}
+
+model Allocation {
+  id        String             @id
+  uId       String?            @unique
+  projectId String
+  project   Project            @relation(fields: [projectId], references: [id])
+  title     String
+  creator   String
+  status    AllocationStatus   @default(INITIAL)
+  details   AllocationDetail[]
+  createAt  DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  deleted   Boolean            @default(false)
+}
+
+model AllocationDetail {
+  id           String     @id @default(uuid())
+  allocationId String
+  allocation   Allocation @relation(fields: [allocationId], references: [id])
+  wallet       String
+  ratio        Int
+  amount       String
+  createAt     DateTime   @default(now())
+}
+
+model IncentivePool {
+  id           String                @id
+  allocationId String
+  projectId    String
+  address      String
+  creator      String
+  timeToClaim  Int
+  depositor    String
+  wallets      String[]
+  details      IncentivePoolDetail[]
+  createAt     DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  deleted      Boolean               @default(false)
+}
+
+enum IncentiveCLAIMStatus {
+  UNCLAIMED
+  CLAIMED
+}
+
+model IncentivePoolDetail {
+  id        String               @id @default(uuid())
+  projectId    String
+  poolId    String
+  pool      IncentivePool        @relation(fields: [poolId], references: [id])
+  token     String
+  wallet    String
+  amount    String
+  ratio     Int
+  status    IncentiveCLAIMStatus @default(UNCLAIMED)
+  createAt  DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  deleted   Boolean              @default(false)
+}
