@@ -16,9 +16,9 @@ export class AllocationController {
     return ApiResponse.success(result);
   }
 
-  @Get('test')
-  async test() {
-    const result = await this.allocationService.test();
-    return ApiResponse.success(result);
-  }
+  // @Get('test')
+  // async test() {
+  //   const result = await this.allocationService.test();
+  //   return ApiResponse.success(result);
+  // }
 }

@@ -1,7 +1,6 @@
-import { Controller, Get, HttpException } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
 import { HealthService } from '@/service/health.service';
-import { CodeEnum } from '@/type/dto/CodeEnum';
 
 @Controller('health')
 export class HealthController {
@@ -12,8 +11,8 @@ export class HealthController {
     return this.appService.health();
   }
 
-  @Get('test')
-  test(): string {
-    throw new HttpException(CodeEnum.INTERNAL_ERROR, 400);
-  }
+  // @Get('test')
+  // test(): string {
+  //   throw new HttpException(CodeEnum.INTERNAL_ERROR, 400);
+  // }
 }
