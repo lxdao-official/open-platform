@@ -1,6 +1,7 @@
-import { AllocationService } from '@/service/allocation.service';
+import { Controller, Get, Inject, Query } from '@nestjs/common';
 
-import { Controller, Inject } from '@nestjs/common';
+import { AllocationService } from '@/service/allocation.service';
+import { ApiResponse } from '@/type/dto/ApiResponse';
 
 @Controller('allocation')
 export class AllocationController {
@@ -9,27 +10,15 @@ export class AllocationController {
     private readonly allocationService: AllocationService,
   ) {}
 
-  // @Get('list')
-  // async getAllocations(@Query() query: AllocationListQuery) {
-  //   const result = await this.allocationService.getAllocationList(query);
-  //   return ApiResponse.success(result);
-  // }
+  @Get()
+  async getAllocations(@Query('wallet') wallet: string) {
+    const result = await this.allocationService.getAllocations(wallet);
+    return ApiResponse.success(result);
+  }
 
-  // @Post('create')
-  // async createAllocation(@Body() body: CreateAllocationBody) {
-  //   const result = await this.allocationService.create(body);
-  //   return ApiResponse.success(result);
-  // }
-
-  // @Put(':allocationId/updateState')
-  // async updateAllocationState(
-  //   @Param('contributionId') contributionId: string,
-  //   @Body() body: UpdateAllocationStatusBody,
-  // ) {
-  //   const result = await this.allocationService.updateAllocationState(
-  //     contributionId,
-  //     body,
-  //   );
-  //   return ApiResponse.success(result);
-  // }
+  @Get('test')
+  async test() {
+    const result = await this.allocationService.test();
+    return ApiResponse.success(result);
+  }
 }

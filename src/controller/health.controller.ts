@@ -1,6 +1,7 @@
+import { Controller, Get, HttpException } from '@nestjs/common';
+
 import { HealthService } from '@/service/health.service';
 import { CodeEnum } from '@/type/dto/CodeEnum';
-import { Controller, Get, HttpException } from '@nestjs/common';
 
 @Controller('health')
 export class HealthController {
