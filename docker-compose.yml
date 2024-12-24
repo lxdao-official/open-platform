@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - '33000:33000'
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
