@@ -29,13 +29,11 @@ https://optimism-sepolia.easscan.org/schema/view/{schemaId}
 
 - address ProjectAddress
 - bytes32 ContributionID
-- string Detail
-- string Type
-- string Proof
-- uint256 StartDate
-- uint256 EndDate
+- address[] Voters
+- uint8[] VoteChoices
+- address Recipient
 - uint256 TokenAmount
-- string Extended
+- bytes Signatures
 
 ### Vote Schema
 
