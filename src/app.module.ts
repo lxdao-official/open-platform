@@ -1,15 +1,11 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from 'nestjs-prisma';
 
-import { AllocationModule } from '@/module/allocation.module';
 import { HealthModule } from '@/module/health.module';
+import { PoolModule } from '@/module/pool.module';
 
 @Module({
-  imports: [
-    PrismaModule.forRoot({ isGlobal: true }),
-    HealthModule,
-    AllocationModule,
-  ],
+  imports: [PrismaModule.forRoot({ isGlobal: true }), HealthModule, PoolModule],
   controllers: [],
   providers: [],
 })
