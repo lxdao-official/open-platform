@@ -5,15 +5,24 @@ import { PrismaService } from 'nestjs-prisma';
 export class PoolService {
   constructor(private prisma: PrismaService) {}
 
-  async getPoolDetails(projectId: string) {
+  async getPoolDetails(projectId: string, timestampGte: string) {
+    const timestampInt =
+      timestampGte.length === 13
+        ? parseInt(timestampGte)
+        : parseInt(timestampGte) * 1000;
     // First get all incentive pools for the project
     const pools = await this.prisma.incentivePool.findMany({
       where: {
         projectId: projectId,
+        createAt: {
+          gte: new Date(timestampInt),
+        },
       },
     });
     const poolSize = pools.length;
-    console.log(`for project ${projectId} found ${poolSize} pools`);
+    console.log(
+      `for project ${projectId}, timestamp >= ${timestampInt}, there are ${poolSize} pools`,
+    );
     // For each pool, get its details and format the response
     const result = await Promise.all(
       pools.map(async (pool) => {
@@ -30,13 +39,29 @@ export class PoolService {
           },
         });
 
+        // 查询 allocation title
+        const allocation = await this.prisma.allocation.findUnique({
+          where: {
+            id: pool.allocationId,
+          },
+          select: {
+            title: true,
+          },
+        });
+
         return {
-          projectId: pool.projectId,
           poolId: pool.id,
           poolAddress: pool.address,
+          poolCreateAt: pool.createAt,
+          allocationId: pool.allocationId,
+          allocationTitle: allocation?.title || null,
+          projectId: pool.projectId,
           creator: pool.creator,
           depositor: pool.depositor,
-          details: details,
+          details: details.map((detail) => ({
+            ...detail,
+            amount: (Number(detail.amount) / 1000000).toString(),
+          })),
         };
       }),
     );
